@@ -32,6 +32,7 @@ struct bl808_clk_data {
 struct bl808_clk_desc {
 	struct bl808_clk_data	*clks;
 	u8			num_clks;
+	bool			bind_pinctrl;
 };
 
 enum {
@@ -184,6 +185,7 @@ static struct bl808_clk_data bl808_glb_clks[] = {
 static const struct bl808_clk_desc bl808_glb_clk_desc = {
 	.clks		= bl808_glb_clks,
 	.num_clks	= ARRAY_SIZE(bl808_glb_clks),
+	.bind_pinctrl	= true,
 };
 
 static struct bl808_clk_data bl808_hbn_clks[] = {
@@ -695,6 +697,10 @@ static int bl808_clk_bind(struct udevice *dev)
 		struct bl808_clk_data *data = &desc->clks[id];
 		data->parent = (struct clk) {};
 	}
+
+	if (desc->bind_pinctrl)
+		device_bind_driver_to_node(dev->parent, "bflb_pinctrl",
+					   dev->name, dev_ofnode(dev), NULL);
 
 	return 0;
 }
