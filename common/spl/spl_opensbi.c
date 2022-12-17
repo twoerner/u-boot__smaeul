@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <hang.h>
 #include <image.h>
+#include <malloc.h>
 #include <spl.h>
 #include <asm/global_data.h>
 #include <asm/smp.h>
@@ -17,8 +18,6 @@
 #include <linux/libfdt.h>
 
 DECLARE_GLOBAL_DATA_PTR;
-
-struct fw_dynamic_info opensbi_info;
 
 static int spl_opensbi_find_uboot_node(void *blob, int *uboot_node)
 {
@@ -66,13 +65,15 @@ void spl_invoke_opensbi(struct spl_image_info *spl_image)
 	if (ret)
 		ret = fit_image_get_load(spl_image->fdt_addr, uboot_node, &uboot_entry);
 
+	struct fw_dynamic_info *opensbi_info = malloc(sizeof(*opensbi_info));
+
 	/* Prepare opensbi_info object */
-	opensbi_info.magic = FW_DYNAMIC_INFO_MAGIC_VALUE;
-	opensbi_info.version = FW_DYNAMIC_INFO_VERSION;
-	opensbi_info.next_addr = uboot_entry;
-	opensbi_info.next_mode = FW_DYNAMIC_INFO_NEXT_MODE_S;
-	opensbi_info.options = CONFIG_SPL_OPENSBI_SCRATCH_OPTIONS;
-	opensbi_info.boot_hart = gd->arch.boot_hart;
+	opensbi_info->magic = FW_DYNAMIC_INFO_MAGIC_VALUE;
+	opensbi_info->version = FW_DYNAMIC_INFO_VERSION;
+	opensbi_info->next_addr = uboot_entry;
+	opensbi_info->next_mode = FW_DYNAMIC_INFO_NEXT_MODE_S;
+	opensbi_info->options = CONFIG_SPL_OPENSBI_SCRATCH_OPTIONS;
+	opensbi_info->boot_hart = gd->arch.boot_hart;
 
 	opensbi_entry = (void (*)(ulong, ulong, ulong))spl_image->entry_point;
 	invalidate_icache_all();
@@ -90,10 +91,10 @@ void spl_invoke_opensbi(struct spl_image_info *spl_image)
 	 */
 	ret = smp_call_function((ulong)spl_image->entry_point,
 				(ulong)spl_image->fdt_addr,
-				(ulong)&opensbi_info, 1);
+				(ulong)opensbi_info, 1);
 	if (ret)
 		hang();
 #endif
 	opensbi_entry(gd->arch.boot_hart, (ulong)spl_image->fdt_addr,
-		      (ulong)&opensbi_info);
+		      (ulong)opensbi_info);
 }
