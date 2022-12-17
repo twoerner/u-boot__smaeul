@@ -9,6 +9,19 @@
 #include <errno.h>
 #include <image.h>
 
+static ulong spl_fit_read(struct spl_load_info *load, ulong file_offset,
+			  ulong size, void *buf)
+{
+	loff_t actread;
+	int ret;
+
+	ret = ext4fs_read(buf, file_offset, size, &actread);
+	if (ret)
+		return ret;
+
+	return actread;
+}
+
 int spl_load_image_ext(struct spl_image_info *spl_image,
 		       struct spl_boot_device *bootdev,
 		       struct blk_desc *block_dev, int partition,
@@ -47,13 +60,26 @@ int spl_load_image_ext(struct spl_image_info *spl_image,
 		goto end;
 	}
 
-	err = spl_parse_image_header(spl_image, bootdev, header);
-	if (err < 0) {
-		puts("spl: ext: failed to parse image header\n");
-		goto end;
-	}
+	if (IS_ENABLED(CONFIG_SPL_LOAD_FIT) &&
+	    image_get_magic(header) == FDT_MAGIC) {
+		struct spl_load_info load;
 
-	err = ext4fs_read((char *)spl_image->load_addr, 0, filelen, &actlen);
+		debug("Found FIT\n");
+		load.read = spl_fit_read;
+		load.bl_len = 1;
+		load.filename = (void *)filename;
+		load.priv = NULL;
+
+		return spl_load_simple_fit(spl_image, &load, 0, header);
+	} else {
+		err = spl_parse_image_header(spl_image, bootdev, header);
+		if (err < 0) {
+			puts("spl: ext: failed to parse image header\n");
+			goto end;
+		}
+
+		err = ext4fs_read((char *)spl_image->load_addr, 0, filelen, &actlen);
+	}
 
 end:
 #ifdef CONFIG_SPL_LIBCOMMON_SUPPORT
