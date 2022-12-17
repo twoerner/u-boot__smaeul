@@ -79,7 +79,9 @@ static int bflb_psram_probe(struct udevice *dev)
 }
 
 static const struct udevice_id bflb_psram_ids[] = {
+#if !IS_ENABLED(CONFIG_SPL) || IS_ENABLED(CONFIG_SPL_BUILD)
 	{ .compatible = "bflb,bl808-psram-uhs" },
+#endif
 	{ }
 };
 

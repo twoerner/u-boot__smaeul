@@ -1,0 +1,55 @@
+#include "binman.dtsi"
+
+/ {
+	clk-xtal {
+		u-boot,dm-spl;
+	};
+
+	cpus {
+		u-boot,dm-spl;
+
+		cpu@0 {
+			u-boot,dm-spl;
+		};
+	};
+
+	soc@20000000 {
+		u-boot,dm-spl;
+
+		glb@20000000 {
+			u-boot,dm-spl;
+
+			sdh-pins {
+				u-boot,dm-spl;
+			};
+
+			uart0-pins {
+				u-boot,dm-spl;
+			};
+		};
+
+		serial@2000a000 {
+			u-boot,dm-spl;
+		};
+
+		pds@2000e000 {
+			u-boot,dm-spl;
+		};
+
+		hbn@2000f000 {
+			u-boot,dm-spl;
+		};
+
+		mmc@20060000 {
+			u-boot,dm-spl;
+		};
+	};
+
+	soc@30000000 {
+		u-boot,dm-spl;
+
+		memory-controller@3000f000 {
+			u-boot,dm-spl;
+		};
+	};
+};

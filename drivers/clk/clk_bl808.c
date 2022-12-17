@@ -717,7 +717,7 @@ static int bl808_clk_probe(struct udevice *dev)
 	const struct bl808_clk_desc *desc = plat->desc;
 	struct clk clk, *parent;
 
-	if (!(gd->flags & GD_FLG_RELOC))
+	if (!IS_ENABLED(CONFIG_SPL_BUILD) && !(gd->flags & GD_FLG_RELOC))
 		return 0;
 
 	printf("                  %s clocks\n", dev->name);

@@ -20,6 +20,7 @@ config BOARD_SPECIFIC_OPTIONS # dummy
 	select BOARD_EARLY_INIT_F
 	select DM_GPIO if GPIO
 	select GENERIC_RISCV
+	select SUPPORT_SPL
 	imply BFLB_SERIAL
 	imply RISCV_TIMER
 
