@@ -136,7 +136,7 @@ extern u8 __dtb_dt_spl_begin[];	/* embedded device tree blob for SPL/TPL */
 /* Get a pointer to the embedded devicetree, if there is one, else NULL */
 static inline u8 *dtb_dt_embedded(void)
 {
-#ifdef CONFIG_OF_EMBED
+#if CONFIG_IS_ENABLED(OF_EMBED)
 # ifdef CONFIG_SPL_BUILD
 	return __dtb_dt_spl_begin;
 # else

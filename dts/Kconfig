@@ -105,6 +105,20 @@ config OF_EMBED
 
 endchoice
 
+choice
+	prompt "Provider of DTB for SPL DT control"
+	depends on OF_CONTROL
+	default SPL_OF_EMBED if OF_EMBED
+	default SPL_OF_SEPARATE if OF_SEPARATE
+
+config SPL_OF_SEPARATE
+	bool "Separate DTB for SPL DT control"
+
+config SPL_OF_EMBED
+	bool "Embedded DTB for SPL DT control"
+
+endchoice
+
 config OF_BOARD
 	bool "Provided by the board (e.g a previous loader) at runtime"
 	default y if SANDBOX || OF_HAS_PRIOR_STAGE
