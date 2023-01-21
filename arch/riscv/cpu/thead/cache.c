@@ -47,11 +47,15 @@ void flush_dcache_all(void)
 
 void flush_dcache_range(unsigned long start, unsigned long end)
 {
-	register unsigned long i asm("a0") = start & -CONFIG_SYS_CACHELINE_SIZE;
+#if 0
 
+	register unsigned long i asm("a0") = start & -CONFIG_SYS_CACHELINE_SIZE;
 	for (; i < end; i += CONFIG_SYS_CACHELINE_SIZE)
 		asm volatile (".long 0x02b5000b" ::: "memory"); /* dcache.cipa a0 */
 	sync_i();
+#else
+	flush_dcache_all();
+#endif
 }
 
 void invalidate_icache_range(unsigned long start, unsigned long end)
